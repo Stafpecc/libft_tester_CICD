@@ -21,7 +21,7 @@ test:
   stage: test
   script:
     - mkdir -p $BUILD_DIR/tests
-    - g++ $CFLAGS -I$LIBFT_DIR $LIBFT_DIR/libft.a tests/test.cpp -o $BUILD_DIR/test_libft
+    - g++ $CFLAGS -I$LIBFT_DIR $LIBFT_DIR/libft.a tests/*.cpp -o $BUILD_DIR/test_libft
     - $BUILD_DIR/test_libft
   only:
     - branches
