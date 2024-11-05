@@ -1,0 +1,28 @@
+stages:
+  - build
+  - test
+
+variables:
+  CC: cc
+  CFLAGS: "-Wall -Wextra -Werror"
+  LIBFT_DIR: "libft"
+  BUILD_DIR: "build"
+
+build_libft:
+  stage: build
+  script:
+    - mkdir -p $BUILD_DIR
+    - make -C $LIBFT_DIR
+  artifacts:
+    paths:
+      - $LIBFT_DIR/libft.a
+
+test:
+  stage: test
+  script:
+    - mkdir -p $BUILD_DIR/tests
+    - cc $CFLAGS -I$LIBFT_DIR $LIBFT_DIR/libft.a tests/*.c -o $BUILD_DIR/test_libft
+    - $BUILD_DIR/test_libft
+  only:
+    - branches
+
