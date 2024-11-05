@@ -1,0 +1,9 @@
+--> .gitlab-ci.yml
+--> Dockerfile
+--> Makefile
+--> libft/
+   -> Makefile
+   -> libft.h
+   -> ft_*.c
+--> tests/
+   -> *.cpp
