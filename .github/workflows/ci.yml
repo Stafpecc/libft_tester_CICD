@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker Image
+      run: |
+        docker build -t libft-image .
+
+    - name: Build libft
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image make -C libft
+
+    - name: Run Tests
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image g++ -Wall -Wextra -Werror -I libft libft/libft.a tests/*.cpp -o tests/test_libft
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image ./tests/test_libft
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker Image
+      run: |
+        docker build -t libft-image .
+
+    - name: Build libft
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image make -C libft
+
+    - name: Run Tests
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image g++ -Wall -Wextra -Werror -I libft libft/libft.a tests/*.cpp -o tests/test_libft
+        docker run --rm -v ${{ github.workspace }}:/Rank_0 libft-image ./tests/test_libft
+
