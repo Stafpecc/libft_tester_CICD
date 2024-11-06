@@ -1,27 +1,50 @@
-stages:
-  - build
-  - test
+#############################################
+#   CONTEXT
+#############################################
 
-variables:
-  CC: cc
-  CFLAGS: "-Wall -Wextra -Werror"
-  LIBFT_DIR: "libft"
-  BUILD_DIR: "build"
-
-build_libft:
-  stage: build
+context:tag:
+  stage: context
+  image:
+    name: alpine/git
+    entrypoint: [ "" ]
   script:
-    - mkdir -p $BUILD_DIR
-    - make -C $LIBFT_DIR
+    - git fetch --all
+    - if [ -n "$CI_COMMIT_TAG" ]; then
+      export GIT_TAG="${CI_COMMIT_TAG}";
+      else
+      export GIT_TAG="${CI_COMMIT_REF_NAME}";
+      fi
+    - echo GIT_TAG=${GIT_TAG}
+    - echo GIT_TAG=$GIT_TAG >> build.env
   artifacts:
-    paths:
-      - $LIBFT_DIR/libft.a
-
-test:
-  stage: test
-  script:
-    - mkdir -p $BUILD_DIR/tests
-    - g++ $CFLAGS -I$LIBFT_DIR $LIBFT_DIR/libft.a tests/*.cpp -o $BUILD_DIR/test_libft
-    - $BUILD_DIR/test_libft
+    reports:
+      dotenv: build.env
   only:
-    - branches
+    - tags
+
+#############################################
+#   LINT
+#############################################
+
+lint:docker:
+  stage: lint
+  image: hadolint/hadolint:v2.12.0-alpine
+  script:
+    - hadolint Dockerfile
+
+#############################################
+#   BUILD
+#############################################
+
+build:image:
+  stage: build
+  image:
+    name: "gcr.io/kaniko-project/executor:v1.23.2-debug"
+    entrypoint: [ "" ]
+  script:
+    - /kaniko/executor --context ${CI_PROJECT_DIR}
+      --dockerfile Dockerfile
+      --destination ${CI_REGISTRY_IMAGE}:${GIT_TAG}
+      --destination ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}
+  only:
+    - tags
